@@ -28,6 +28,7 @@ def sitemap():
 @app.route('/members', methods=['GET'])
 def handle_hello():
 
+
     # this is how you can use the Family datastructure by calling its methods
     members = jackson_family.get_all_members()
     response_body = {
@@ -35,8 +36,40 @@ def handle_hello():
         "family": members
     }
 
+    return jsonify(response_body), 200
+
+
+@app.route('/member/<int:member_id>', methods=['GET'])
+def delete_member(member_id):
+    member = jackson_family.get_member(member_id)
+
+    response_body = {"member":member}
 
     return jsonify(response_body), 200
+
+
+@app.route('/member', methods=['POST'])
+def add_member():
+    new_member = {
+        "first_name":request.json["first_name"],
+        "age":request.json["age"],
+        "lucky_number": request.json["lucky_number"],
+        "id": jackson_family._generateId() 
+    }
+
+    jackson_family.add_member(new_member)
+
+    response_body = {}
+
+    return jsonify(response_body)
+
+@app.route('/member/<int:member_id>', methods=['DELETE'])
+def delete_member(member_id):
+
+    jackson_family.delete_member(member_id)
+
+    request_body={jackson_family.get_all_members()}
+    return jsonify(request_body)
 
 # this only runs if `$ python src/app.py` is executed
 if __name__ == '__main__':
